@@ -1,0 +1,13 @@
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // WARNING: These rules are insecure and are for demonstration purposes only.
+    // In a production environment, you should implement proper authentication
+    // and authorization checks.
+    match /rooms/{roomId}/{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
