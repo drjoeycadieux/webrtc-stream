@@ -18,13 +18,13 @@ export default function Home() {
               Seamless Video Meetings.
             </h2>
             <p className="text-lg text-muted-foreground">
-              Create a room, share the code, and start collaborating with your team in seconds. High-quality video, screen sharing, and messaging, all in one place.
+              Create a new, private video room with a single click. A unique room ID will be generated for you to share with your colleagues. They can join your room using this ID. Enjoy high-quality video, screen sharing, and real-time messaging.
             </p>
           </div>
           <Card className="shadow-2xl shadow-primary/10">
             <CardHeader>
               <CardTitle>Get Started</CardTitle>
-              <CardDescription>Create or join a room to start your meeting.</CardDescription>
+              <CardDescription>Create a new room or join an existing one using a room code.</CardDescription>
             </CardHeader>
             <CardContent>
               <RoomHandler />
