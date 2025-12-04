@@ -99,6 +99,9 @@ export default function RoomPage() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         setLocalStream(stream);
+        if (localVideoRef.current) {
+          localVideoRef.current.srcObject = stream;
+        }
         setIsLoading(false);
       } catch (error) {
         console.error("Error accessing media devices.", error);
@@ -252,7 +255,7 @@ export default function RoomPage() {
   return (
     <div className="flex h-screen w-screen bg-background text-foreground relative">
       <main className="flex-1 flex flex-col">
-        <VideoGrid localStream={localStream} remoteStreams={remoteStreams} />
+        <VideoGrid localVideoRef={localVideoRef} localStream={localStream} remoteStreams={remoteStreams} />
         <CallControls
           onLeave={handleLeave}
           onToggleMute={toggleMute}

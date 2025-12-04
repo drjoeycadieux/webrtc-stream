@@ -6,9 +6,10 @@ import VideoPlayer from "./video-player";
 type VideoGridProps = {
   localStream: MediaStream | null;
   remoteStreams: Record<string, MediaStream>;
+  localVideoRef: React.RefObject<HTMLVideoElement>;
 };
 
-export default function VideoGrid({ localStream, remoteStreams }: VideoGridProps) {
+export default function VideoGrid({ localStream, remoteStreams, localVideoRef }: VideoGridProps) {
   const allStreams = [localStream, ...Object.values(remoteStreams)].filter(Boolean) as MediaStream[];
   const totalStreams = allStreams.length;
 
@@ -21,7 +22,7 @@ export default function VideoGrid({ localStream, remoteStreams }: VideoGridProps
   
   return (
     <div className={`grid flex-1 gap-4 p-4 ${gridClasses()}`}>
-      {localStream && <VideoPlayer stream={localStream} muted name="You" />}
+      {localStream && <VideoPlayer ref={localVideoRef} stream={localStream} muted name="You" />}
       {Object.entries(remoteStreams).map(([peerId, stream]) => (
         <VideoPlayer key={peerId} stream={stream} name={`Peer ${peerId.substring(0, 4)}`} />
       ))}
