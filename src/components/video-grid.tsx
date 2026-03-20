@@ -6,7 +6,7 @@ import VideoPlayer from "./video-player";
 type VideoGridProps = {
   localStream: MediaStream | null;
   remoteStreams: Record<string, MediaStream>;
-  localVideoRef: React.RefObject<HTMLVideoElement>;
+  localVideoRef: React.RefObject<HTMLVideoElement | null>;
 };
 
 export default function VideoGrid({ localStream, remoteStreams, localVideoRef }: VideoGridProps) {
