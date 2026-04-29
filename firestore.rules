@@ -3,11 +3,71 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // WARNING: These rules are insecure and are for demonstration purposes only.
-    // In a production environment, you should implement proper authentication
-    // and authorization checks.
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to validate room data
+    function isValidRoomData() {
+      return request.resource.data.keys().hasOnly(['createdAt', 'createdBy', 'isActive']) &&
+             request.resource.data.createdAt is timestamp &&
+             request.resource.data.isActive is bool;
+    }
+    
+    // Helper function to validate participant data
+    function isValidParticipantData() {
+      return request.resource.data.keys().hasOnly(['id', 'joinedAt']) &&
+             request.resource.data.id is string &&
+             request.resource.data.joinedAt is timestamp;
+    }
+    
+    // Helper function to validate signaling data
+    function isValidSignalingData() {
+      return request.resource.data.keys().hasOnly(['from', 'to', 'type', 'data']) &&
+             request.resource.data.from is string &&
+             request.resource.data.to is string &&
+             request.resource.data.type in ['offer', 'answer', 'candidate'];
+    }
+    
+    // Helper function to validate chat message data
+    function isValidMessageData() {
+      return request.resource.data.keys().hasOnly(['text', 'senderId', 'timestamp']) &&
+             request.resource.data.text is string &&
+             request.resource.data.senderId is string &&
+             request.resource.data.timestamp is timestamp;
+    }
+    
+    // Rooms collection - allow read/write for authenticated users
+    match /rooms/{roomId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && 
+                               resource.data.createdBy == request.auth.uid;
+    }
+    
+    // Room subcollections
     match /rooms/{roomId}/{document=**} {
-      allow read, write: if true;
+      // Participants subcollection
+      match /participants/{participantId} {
+        allow read: if true;
+        allow create: if isAuthenticated() && isValidParticipantData();
+        allow delete: if isAuthenticated() && request.auth.uid == resource.data.id;
+      }
+      
+      // Signaling subcollection for WebRTC
+      match /signaling/{signalId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated() && isValidSignalingData();
+        allow delete: if isAuthenticated();
+      }
+      
+      // Messages subcollection for chat
+      match /messages/{messageId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated() && isValidMessageData();
+        allow update, delete: if false; // Messages should be immutable
+      }
     }
   }
 }
